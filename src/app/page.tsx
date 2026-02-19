@@ -1,65 +1,491 @@
+"use client";
+
 import Image from "next/image";
+import { useState, useEffect, useRef } from "react";
+import { ChevronDown } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 export default function Home() {
+  const [selectedModel, setSelectedModel] = useState("Choose Model");
+  const [showDropdown, setShowDropdown] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  
+  // Form state
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState("");
+
+  // Handle form submission - only on button click, not auto-submit
+  const handleSubmit = async () => {
+    // Validation
+    if (!formData.name.trim() || !formData.email.trim() || !formData.phone.trim()) {
+      setSubmitStatus("error");
+      setErrorMessage("Please fill in all fields");
+      return;
+    }
+
+    if (selectedModel === "Choose Model") {
+      setSubmitStatus("error");
+      setErrorMessage("Please select a model");
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitStatus("idle");
+    setErrorMessage("");
+
+    try {
+      const response = await fetch("/api/submit", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.name.trim(),
+          email: formData.email.trim(),
+          phone: formData.phone.trim(),
+          model: selectedModel,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to submit form");
+      }
+
+      setSubmitStatus("success");
+      // Reset form
+      setFormData({ name: "", email: "", phone: "" });
+      setSelectedModel("Choose Model");
+      
+      // Reset success message after 5 seconds
+      setTimeout(() => {
+        setSubmitStatus("idle");
+      }, 5000);
+    } catch (error) {
+      setSubmitStatus("error");
+      setErrorMessage(error instanceof Error ? error.message : "Failed to submit form. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Prevent form submission on Enter key
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+    }
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+
+    if (showDropdown) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [showDropdown]);
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
+    <div className="relative w-full min-h-screen overflow-hidden" style={{ backgroundColor: '#FFFFFF', margin: 0, padding: 0, width: '100vw', height: '100vh', overflowY: 'hidden' }}>
+      {/* Desktop Container - Full Width, Full Height, No Scroll */}
+      <div className="relative w-full overflow-hidden" style={{ height: '100vh', margin: 0, padding: 0, width: '100%', overflowY: 'hidden' }}>
+      {/* Background Hero Image - Full Width */}
+      <div className="absolute inset-0 z-0 w-full h-full">
         <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
+          src="/mhero-hero.svg"
+          alt="Mhero SUV"
+          fill
+          className="object-cover object-center"
           priority
+          quality={100}
+          sizes="100vw"
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+      </div>
+
+      {/* Radial Gradient Overlay */}
+      <div 
+        className="absolute z-10 w-full h-full"
+        style={{
+          width: '100%',
+          height: '100%',
+          left: '0',
+          top: '0',
+          background: 'radial-gradient(47.36% 47.36% at 50% 55.18%, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.488175) 72.63%, rgba(0, 0, 0, 0.64) 100%)',
+        }}
+      />
+
+      {/* Language Selector Button */}
+      <div 
+        className="absolute z-20 flex items-center justify-center"
+        style={{
+          width: '117px',
+          height: '40px',
+          right: '10%',
+          top: '5%',
+          padding: '6px 18px',
+          gap: '5px',
+          background: 'rgba(255, 255, 255, 0.1)',
+          border: '0.8px solid #ECECEC',
+          borderRadius: '30px',
+        }}
+      >
+        <div className="flex items-center gap-1">
+          <Image
+            src="/globe.svg"
+            alt="Globe"
+            width={24}
+            height={24}
+            className="h-6 w-6"
+          />
+          <span className="text-sm font-normal text-[#F4F4F4]" style={{ fontSize: '18px', lineHeight: '28px', letterSpacing: '-0.449219px' }}>
+            Arabic
+          </span>
+        </div>
+      </div>
+
+      {/* Main Content Container - Frame 1 */}
+      <div 
+        className="absolute z-20 left-1/2 -translate-x-1/2 flex flex-col items-center"
+        style={{
+          width: '625px',
+          height: '178.46px',
+          top: '9%',
+          gap: '7px',
+        }}
+      >
+        {/* Central Logo */}
+        <div className="flex items-center justify-center" style={{ width: '44px', height: '51.46px' }}>
+          <Image
+            src="/logo.svg"
+            alt="Mhero Logo"
+            width={44}
+            height={52}
+            className="h-full w-full"
+          />
+        </div>
+
+        {/* Coming Soon Section */}
+        <div className="flex flex-col items-center" style={{ width: '625px', height: '120px', gap: '4px' }}>
+          {/* COMING SOON Heading */}
+          <h1 
+            className="font-normal uppercase text-white whitespace-nowrap"
+            style={{
+              fontFamily: 'Inter',
+              fontSize: '46px',
+              lineHeight: '60px',
+              textAlign: 'center',
+              letterSpacing: '4.76px',
+            }}
+          >
+            Coming Soon
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+
+          {/* Tagline */}
+          <p 
+            className="font-normal text-center"
+            style={{
+              width: '625px',
+              height: '56px',
+              fontFamily: 'Inter',
+              fontSize: '18px',
+              lineHeight: '28px',
+              textAlign: 'center',
+              color: '#EBEBEB',
+            }}
+          >
+            We&apos;re building something beautiful. Leave your details and be the first to know when we launch.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+      </div>
+
+      {/* Form Container */}
+      <div
+        className="absolute z-20 left-1/2 -translate-x-1/2 flex flex-col items-center"
+        style={{
+          width: '941px',
+          bottom: '3%',
+          gap: '14px',
+        }}
+        onKeyDown={handleKeyDown}
+      >
+        {/* Input Fields Container */}
+        <div className="relative" style={{ width: '941px', height: '50px' }}>
+          {/* Your Name */}
+          <Input
+            type="text"
+            placeholder="Your Name"
+            value={formData.name}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+              }
+            }}
+            className="absolute text-white placeholder:text-white"
+            style={{
+              width: '227.75px',
+              height: '50px',
+              left: '0px',
+              top: '0px',
+              padding: '16px 24px',
+              background: 'rgba(255, 255, 255, 0.1)',
+              border: '0.8px solid #AAAAAA',
+              borderRadius: '28px',
+              fontFamily: 'Inter',
+              fontSize: '16px',
+              lineHeight: '19px',
+              letterSpacing: '-0.3125px',
+            }}
+          />
+
+          {/* Your Email */}
+          <Input
+            type="email"
+            placeholder="Your Email"
+            value={formData.email}
+            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+              }
+            }}
+            className="absolute text-white placeholder:text-white"
+            style={{
+              width: '227.75px',
+              height: '50px',
+              left: '237.75px',
+              top: '0px',
+              padding: '16px 24px',
+              background: 'rgba(255, 255, 255, 0.1)',
+              border: '0.8px solid #AAAAAA',
+              borderRadius: '28px',
+              fontFamily: 'Inter',
+              fontSize: '16px',
+              lineHeight: '19px',
+              letterSpacing: '-0.3125px',
+            }}
+          />
+
+          {/* Your Phone */}
+          <Input
+            type="tel"
+            placeholder="Your Phone"
+            value={formData.phone}
+            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+              }
+            }}
+            className="absolute text-white placeholder:text-white"
+            style={{
+              width: '227.75px',
+              height: '50px',
+              left: '475.5px',
+              top: '0px',
+              padding: '16px 24px',
+              background: 'rgba(255, 255, 255, 0.1)',
+              border: '0.8px solid #AAAAAA',
+              borderRadius: '28px',
+              fontFamily: 'Inter',
+              fontSize: '16px',
+              lineHeight: '19px',
+              letterSpacing: '-0.3125px',
+            }}
+          />
+
+          {/* Model Dropdown */}
+          <div ref={dropdownRef} className="absolute" style={{ width: '227.75px', height: '50px', left: '713.25px', top: '0px' }}>
+            <button
+              onClick={() => setShowDropdown(!showDropdown)}
+              className="w-full h-full flex flex-row items-center justify-between outline-none box-border cursor-pointer transition-all duration-200"
+              style={{
+                borderRadius: '28px',
+                borderWidth: '0.8px',
+                padding: '16px 24px',
+                background: showDropdown ? 'rgba(255, 255, 255, 0.15)' : 'rgba(255, 255, 255, 0.1)',
+                border: '0.8px solid rgba(170, 170, 170, 1)',
+                fontFamily: 'Inter',
+                fontWeight: 400,
+                fontStyle: 'normal',
+                fontSize: '16px',
+                lineHeight: '100%',
+                letterSpacing: '-0.3125px',
+                color: 'rgba(255, 255, 255, 1)',
+              }}
+              onMouseEnter={(e) => {
+                if (!showDropdown) {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.15)';
+                  e.currentTarget.style.borderColor = 'rgba(200, 200, 200, 1)';
+                }
+              }}
+              onMouseLeave={(e) => {
+                if (!showDropdown) {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)';
+                  e.currentTarget.style.borderColor = 'rgba(170, 170, 170, 1)';
+                }
+              }}
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+              <span 
+                className="flex-none transition-opacity duration-200"
+                style={{ 
+                  opacity: selectedModel === 'Choose Model' ? 0.7 : 1 
+                }}
+              >
+                {selectedModel}
+              </span>
+              <ChevronDown
+                className="flex-none transition-transform duration-200 text-white"
+                style={{ 
+                  width: '8px',
+                  height: '16px',
+                  transform: showDropdown ? 'rotate(270deg)' : 'rotate(90deg)',
+                  opacity: 0.8,
+                }}
+              />
+            </button>
+            {showDropdown && (
+              <div 
+                className="absolute bottom-[54px] left-0 w-full z-20 overflow-hidden"
+                style={{
+                  background: 'rgba(20, 20, 20, 0.98)',
+                  border: '0.8px solid rgba(170, 170, 170, 0.6)',
+                  borderRadius: '12px',
+                  boxShadow: '0 -8px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05) inset',
+                  backdropFilter: 'blur(20px)',
+                  animation: 'dropdownFadeInUp 0.2s ease-out',
+                }}
+              >
+                {["Model 1", "Model 2", "Model 3"].map((model, index) => (
+                  <button
+                    key={model}
+                    onClick={() => {
+                      setSelectedModel(model);
+                      setShowDropdown(false);
+                    }}
+                    className="w-full text-left transition-all duration-150 relative"
+                    style={{
+                      paddingTop: '14px',
+                      paddingRight: '24px',
+                      paddingBottom: '14px',
+                      paddingLeft: '24px',
+                      fontFamily: 'Inter',
+                      fontWeight: 400,
+                      fontSize: '16px',
+                      lineHeight: '19px',
+                      letterSpacing: '-0.31px',
+                      color: selectedModel === model ? 'rgba(255, 255, 255, 1)' : 'rgba(255, 255, 255, 0.9)',
+                      background: 'transparent',
+                      border: 'none',
+                      borderBottom: index < 2 ? '0.8px solid rgba(170, 170, 170, 0.15)' : 'none',
+                    }}
+                    onMouseEnter={(e) => {
+                      e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)';
+                      e.currentTarget.style.color = 'rgba(255, 255, 255, 1)';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.background = 'transparent';
+                      e.currentTarget.style.color = selectedModel === model ? 'rgba(255, 255, 255, 1)' : 'rgba(255, 255, 255, 0.9)';
+                    }}
+                  >
+                    {model}
+                    {selectedModel === model && (
+                      <span 
+                        className="absolute right-[24px] top-1/2 -translate-y-1/2"
+                        style={{
+                          fontSize: '12px',
+                          opacity: 0.6,
+                        }}
+                      >
+                        ✓
+                      </span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
-      </main>
+
+        {/* Status Message */}
+        {(submitStatus === "success" || submitStatus === "error") && (
+          <div 
+            className="text-center text-sm"
+            style={{
+              color: submitStatus === "success" ? "#4ade80" : "#ef4444",
+              fontFamily: 'Inter',
+              fontSize: '14px',
+              marginTop: '8px',
+            }}
+          >
+            {submitStatus === "success" 
+              ? "✓ Thank you! We'll notify you soon." 
+              : errorMessage}
+          </div>
+        )}
+
+        {/* NOTIFY ME Button */}
+        <button 
+          type="button"
+          onClick={handleSubmit}
+          disabled={isSubmitting}
+          className="text-white uppercase flex flex-row items-center justify-center outline-none cursor-pointer transition-all duration-200 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
+          style={{
+            width: '212px',
+            height: '50px',
+            padding: '13px 55px',
+            gap: '10px',
+            background: isSubmitting ? 'rgba(13, 14, 15, 0.7)' : '#0D0E0F',
+            borderRadius: '80px',
+            fontFamily: 'Inter',
+            fontWeight: 500,
+            fontSize: '18px',
+            lineHeight: '24px',
+            textAlign: 'center',
+            border: 'none',
+          }}
+          onMouseEnter={(e) => {
+            if (!isSubmitting) {
+              e.currentTarget.style.background = 'rgba(13, 14, 15, 0.9)';
+              e.currentTarget.style.transform = 'scale(1.02)';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (!isSubmitting) {
+              e.currentTarget.style.background = '#0D0E0F';
+              e.currentTarget.style.transform = 'scale(1)';
+            }
+          }}
+          onMouseDown={(e) => {
+            if (!isSubmitting) {
+              e.currentTarget.style.transform = 'scale(0.98)';
+            }
+          }}
+          onMouseUp={(e) => {
+            if (!isSubmitting) {
+              e.currentTarget.style.transform = 'scale(1.02)';
+            }
+          }}
+        >
+          {isSubmitting ? "Submitting..." : "Notify Me"}
+        </button>
+      </div>
+      </div>
     </div>
   );
 }
