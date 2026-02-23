@@ -445,7 +445,7 @@ export default function Home() {
                       animation: "dropdownFadeInUp 0.2s ease-out",
                     }}
                   >
-                    {["MHERO I", "MHERO I"].map(
+                    {["MHERO I", "MHERO II"].map(
                       (model, index) => (
                         <button
                           key={model}
