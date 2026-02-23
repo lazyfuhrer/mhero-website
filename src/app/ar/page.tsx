@@ -789,7 +789,7 @@ export default function HomeAr() {
               {/* Model Dropdown - Mobile */}
               <div
                 ref={mobileDropdownRef}
-                style={{ width: "305px", height: "39px" }}
+                style={{ width: "305px", height: "39px", position: "relative" }}
               >
                 <button
                   onClick={() => setShowDropdown(!showDropdown)}
@@ -835,7 +835,8 @@ export default function HomeAr() {
                   <div
                     className="absolute w-[305px] z-20 overflow-hidden"
                     style={{
-                      marginTop: "4px",
+                      bottom: "43px",
+                      left: 0,
                       background: "rgba(20, 20, 20, 0.98)",
                       border: "0.8px solid rgba(170, 170, 170, 0.6)",
                       borderRadius: "12px",
