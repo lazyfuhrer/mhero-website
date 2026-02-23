@@ -709,6 +709,8 @@ export default function Home() {
                 letterSpacing: "0px",
                 textAlign: "center",
                 color: "#EBEBEB",
+                padding: "0 24px",
+                boxSizing: "border-box",
               }}
             >
               We&apos;re building something beautiful. Leave your details and be
