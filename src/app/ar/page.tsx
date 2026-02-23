@@ -558,6 +558,19 @@ export default function HomeAr() {
             }}
           />
 
+          {/* Bottom Gradient Overlay (Rectangle 3) */}
+          <div
+            className="absolute left-0 w-full"
+            style={{
+              height: "391px",
+              left: "0px",
+              bottom: "-28px",
+              background:
+                "linear-gradient(180deg, #000000 0%, rgba(0, 0, 0, 0.659361) 54.27%, rgba(0, 0, 0, 0) 100%)",
+              transform: "matrix(1, 0, 0, -1, 0, 0)",
+            }}
+          />
+
           {/* Language Selector - Mobile (back to English) - same alignment as EN version */}
           <Link
             href="/"
@@ -905,10 +918,14 @@ export default function HomeAr() {
               type="button"
               onClick={handleSubmit}
               disabled={isSubmitting}
-              className="text-white flex flex-row items-center justify-center outline-none cursor-pointer transition-all duration-200 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed w-full"
+              className="text-white flex flex-row items-center justify-center outline-none cursor-pointer transition-all duration-200 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
               style={{
+                width: "305px",
                 height: "39px",
-                padding: "12px 24px",
+                paddingTop: "12px",
+                paddingRight: "55px",
+                paddingBottom: "12px",
+                paddingLeft: "55px",
                 gap: "10px",
                 background: isSubmitting
                   ? "rgba(13, 14, 15, 0.4)"
@@ -919,6 +936,7 @@ export default function HomeAr() {
                 fontSize: "12px",
                 lineHeight: "15px",
                 textAlign: "center",
+                letterSpacing: "0.4875px",
                 border: "none",
               }}
             >

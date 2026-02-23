@@ -615,6 +615,19 @@ export default function Home() {
           }}
         />
 
+        {/* Bottom Gradient Overlay (Rectangle 3) */}
+        <div
+          className="absolute left-0 w-full"
+          style={{
+            height: "391px",
+            left: "0px",
+            bottom: "-28px",
+            background:
+              "linear-gradient(180deg, #000000 0%, rgba(0, 0, 0, 0.659361) 54.27%, rgba(0, 0, 0, 0) 100%)",
+            transform: "matrix(1, 0, 0, -1, 0, 0)",
+          }}
+        />
+
         {/* Language Selector - Mobile */}
         <Link
           href="/ar"
@@ -709,8 +722,6 @@ export default function Home() {
                 letterSpacing: "0px",
                 textAlign: "center",
                 color: "#EBEBEB",
-                padding: "0 24px",
-                boxSizing: "border-box",
               }}
             >
               We&apos;re building something beautiful. Leave your details and be
@@ -855,17 +866,24 @@ export default function Home() {
                 }}
               >
                 <span
-                  className="flex-1 text-left"
                   style={{
-                    opacity: selectedModel === "Choose Model" ? 0.7 : 1,
+                    width: "100%",
+                    height: "15px",
+                    fontFamily: "Inter",
                     fontWeight: 400,
+                    fontSize: "12px",
+                    lineHeight: "15px",
+                    letterSpacing: "-0.3125px",
+                    textAlign: "left",
+                    opacity: selectedModel === "Choose Model" ? 0.7 : 1,
                   }}
                 >
                   {selectedModel}
                 </span>
                 <ChevronDown
-                  className="text-white flex-none"
+                  className="text-white"
                   style={{
+                    margin: "0 auto",
                     width: "8px",
                     height: "16px",
                     transform: "rotate(90deg)",
@@ -961,10 +979,14 @@ export default function Home() {
             type="button"
             onClick={handleSubmit}
             disabled={isSubmitting}
-            className="text-white uppercase flex flex-row items-center justify-center outline-none cursor-pointer transition-all duration-200 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed w-full"
+          className="text-white uppercase flex flex-row items-center justify-center outline-none cursor-pointer transition-all duration-200 whitespace-nowrap disabled:opacity-50 disabled:cursor-not-allowed"
             style={{
-              height: "39px",
-              padding: "12px 55px",
+            width: "305px",
+            height: "39px",
+            paddingTop: "12px",
+            paddingRight: "55px",
+            paddingBottom: "12px",
+            paddingLeft: "55px",
               gap: "10px",
               background: isSubmitting
                 ? "rgba(13, 14, 15, 0.4)"
@@ -975,6 +997,7 @@ export default function Home() {
               fontSize: "12px",
               lineHeight: "15px",
               textAlign: "center",
+            letterSpacing: "0.4875px",
               border: "none",
             }}
           >
